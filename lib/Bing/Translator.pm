@@ -262,6 +262,22 @@ sub _decodeTranslateArrayOutput {
 	return $result_array;
 }
 
+sub _decodeTranslateArray2Output {
+	my ($self, $response_content) = @_;
+	my $result_array;
+	
+	if ( $response_content =~ /^<ArrayOfTranslateArray2Response/ ) {
+		my @responses = ( $response_content =~ m{<TranslateArray2Response>(.*?)</TranslateArray2Response>}g );
+		
+		$result_array = [ map {
+			$_ =~ m{<Alignment>(.*?)</Alignment>.*?<TranslatedText>(.*?)</TranslatedText>};
+			[$2, $1],
+		} @responses ];
+	}
+	
+	return $result_array;
+}
+
 sub _createContentXMLTranslateArray {
 	my ($self, $lang_from, $lang_to, $text_array) = @_;
 	
