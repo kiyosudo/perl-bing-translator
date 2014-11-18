@@ -59,6 +59,8 @@ Return the translation of input text (using Bing Translator's Translate method)
 
 =item $text   ... input text
 
+=item return value ... $translation
+
 =back
 
 =cut
@@ -99,6 +101,8 @@ Return the reference to the array of the translation for the input text in $text
 
 =item $text_array ... reference to the array of input text
 
+=item return value ... [$trans1, $tran2, ...]
+
 =back
 
 =cut
@@ -113,6 +117,42 @@ sub translate_array {
 	
 	my $result = $self->_sendRequest(
 		"TranslateArray",
+		"from" => $from,
+		"to" => $to,
+		"contentType" => "text/xml",
+		"text_array" => $text_array,
+	);
+	
+	return $result;
+}
+
+=head2 translate_array2($from, $to, $text_array)
+
+Return the reference to the array of the translation with word alignment information for the input text in $text_array (using Bing Translator's TranslateArray2 method)
+
+=over 1
+
+=item $from       ... source language
+
+=item $to         ... target language
+
+=item $text_array ... reference to the array of input text
+
+=item return value ... [[$trans1, $align1], [$tran2, $align2], ...]
+
+=back
+=cut
+sub translate_array2 {
+	my ($self, $from, $to, $text_array) = @_;
+	##
+	##  translate_array2 method:
+	##    using Bing Translator's TranslateArray2 method:
+	##    http://msdn.microsoft.com/en-us/library/ff512422.aspx
+	##
+	my $result_array = [];
+	
+	my $result = $self->_sendRequest(
+		"TranslateArray2",
 		"from" => $from,
 		"to" => $to,
 		"contentType" => "text/xml",
