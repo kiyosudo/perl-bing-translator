@@ -49,30 +49,27 @@ sub new {
 
 =head2 translate($from, $to, $text)
 
-Return translation of input text
+Return translation of input text (using Bing Translator's Translate method)
+
+=over 1
+
+=item $from   ... source language
+
+=item $to     ... target language
+
+=item $text   ... input text
+
+=back
 
 =cut
-sub translate_array {
-	my ($self, $from, $to, $text_array) = @_;
-	my $result_array = [];
-	
-	my $result = $self->_sendRequest(
-		"TranslateArray",
-		"from" => $from,
-		"to" => $to,
-		"contentType" => "text/xml",
-		"text_array" => $text_array,
-	);
-	
-	return $result;
-}
 
-##
-##  Translate method:
-##    http://msdn.microsoft.com/en-us/library/ff512421.aspx
-##
 sub translate {
 	my ($self, $from, $to, $text) = @_;
+	##
+	##  translate method:
+	##    using Bing Translator's Translate method:
+	##    http://msdn.microsoft.com/en-us/library/ff512421.aspx
+	##
 
 	my $result = $self->_sendRequest(
 		"Translate",
@@ -87,6 +84,42 @@ sub translate {
 	} else {
 		return undef;
 	}
+}
+
+
+=head2 translate_array($from, $to, $text_array)
+
+Return the array of the translation of input text in the array reference.
+
+=over 1
+
+=item $from       ... source language
+
+=item $to         ... target language
+
+=item $text_array ... reference to the array of input text
+
+=back
+
+=cut
+sub translate_array {
+	my ($self, $from, $to, $text_array) = @_;
+	##
+	##  translate_array method:
+	##    using Bing Translator's TranslateArray method:
+	##    http://msdn.microsoft.com/en-us/library/ff512422.aspx
+	##
+	my $result_array = [];
+	
+	my $result = $self->_sendRequest(
+		"TranslateArray",
+		"from" => $from,
+		"to" => $to,
+		"contentType" => "text/xml",
+		"text_array" => $text_array,
+	);
+	
+	return $result;
 }
 
 sub _sendRequest {
@@ -130,10 +163,6 @@ sub _sendRequest {
 		}
 	
 	} elsif ( $function eq "Translate" ) {
-		##
-		##  Translate method:
-		##    http://msdn.microsoft.com/en-us/library/ff512421.aspx
-		##
 		my ($lang_from, $lang_to, $text) = (
 			$args{from},
 			$args{to},
