@@ -30,7 +30,7 @@ our $VERSION = '0.01';
 
     my $translator = Bing::Translator->new(client_id => "xxx", client_secret => "yyy");
 
-    print $translator->translate("こんにちは", "ja", "en");
+    print $translator->translate("ja", "en", "こんにちは");
     ...
 
 =cut
