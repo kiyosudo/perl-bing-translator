@@ -67,16 +67,23 @@ sub translate_array {
 	return $result;
 }
 
+##
+##  Translate method:
+##    http://msdn.microsoft.com/en-us/library/ff512421.aspx
+##
 sub translate {
 	my ($self, $from, $to, $text) = @_;
-	my $result = $self->translate_array(
-		$from,
-		$to,
-		[$text],
-	);
 
+	my $result = $self->_sendRequest(
+		"Translate",
+		"from" => $from,
+		"to" => $to,
+		"contentType" => "text/html",
+		"text" => $text,
+	);
+	
 	if ( defined $result ) {
-		return $result->[0];
+		return $result;
 	} else {
 		return undef;
 	}
@@ -121,6 +128,44 @@ sub _sendRequest {
 		} else {
 			croak $response->status_line;
 		}
+	
+	} elsif ( $function eq "Translate" ) {
+		##
+		##  Translate method:
+		##    http://msdn.microsoft.com/en-us/library/ff512421.aspx
+		##
+		my ($lang_from, $lang_to, $text) = (
+			$args{from},
+			$args{to},
+			$args{text},
+		);
+
+		my $translator_url = "http://api.microsofttranslator.com/v2/Http.svc/Translate?".
+		"text=". uri_encode($text).
+		"&from=". $lang_from.
+		"&to=". $lang_to;
+
+		my $ua = LWP::UserAgent->new;
+		my $request = HTTP::Request->new(
+			"GET",
+			$translator_url,
+			HTTP::Headers->new(
+				'Content-Type' => 'text/html',
+				'Authorization' => $self->{token},
+			),
+		);
+
+		my $response = $ua->request( $request );
+
+		if ( $response->is_success ) {
+			if ( $response->decoded_content =~ /<string.*?>(.*?)<\/string>/ ) {
+				return $1;
+			}
+			return $response->decoded_content;
+		} else {
+			croak $response->status_line;
+		}
+	
 	}
 }
 
