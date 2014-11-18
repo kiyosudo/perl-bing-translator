@@ -49,7 +49,7 @@ sub new {
 
 =head2 translate($from, $to, $text)
 
-Return translation of input text (using Bing Translator's Translate method)
+Return the translation of input text (using Bing Translator's Translate method)
 
 =over 1
 
@@ -89,7 +89,7 @@ sub translate {
 
 =head2 translate_array($from, $to, $text_array)
 
-Return the array of the translation of input text in the array reference.
+Return the reference to the array of the translation for the input text in $text_array (using Bing Translator's TranslateArray method)
 
 =over 1
 
@@ -134,7 +134,7 @@ sub _sendRequest {
 			$args{text_array},
 		);
 
-		my $translator_url = "http://api.microsofttranslator.com/V2/Http.svc/TranslateArray2";
+		my $translator_url = "http://api.microsofttranslator.com/V2/Http.svc/TranslateArray";
 		my $content_xml = $self->_createContentXMLTranslateArray(
 			$lang_from, $lang_to, $text_array,
 		);
@@ -203,12 +203,12 @@ sub _decodeTranslateArrayOutput {
 	my ($self, $response_content) = @_;
 	my $result_array;
 	
-	if ( $response_content =~ /^<ArrayOfTranslateArray2Response/ ) {
-		my @responses = ( $response_content =~ m{<TranslateArray2Response>(.*?)</TranslateArray2Response>}g );
+	if ( $response_content =~ /^<ArrayOfTranslateArrayResponse/ ) {
+		my @responses = ( $response_content =~ m{<TranslateArrayResponse>(.*?)</TranslateArrayResponse>}g );
 		
 		$result_array = [ map {
-			$_ =~ m{<Alignment>(.*?)</Alignment>.*?<TranslatedText>(.*?)</TranslatedText>};
-			[$2, $1],
+			$_ =~ m{<TranslatedText>(.*?)</TranslatedText>};
+			$1,
 		} @responses ];
 	}
 	
