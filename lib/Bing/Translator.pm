@@ -167,14 +167,17 @@ sub _sendRequest {
 		
 	my $token = $self->_getAccessToken();
 
-	if ( $function eq 'TranslateArray' ) {
+	if ( $function eq 'TranslateArray' ||
+			$function eq 'TranslateArray2' ) {
 		my ($lang_from, $lang_to, $text_array) = (
 			$args{from},
 			$args{to},
 			$args{text_array},
 		);
 
-		my $translator_url = "http://api.microsofttranslator.com/V2/Http.svc/TranslateArray";
+		my $translator_url = $function eq 'TranslateArray' ?
+			"http://api.microsofttranslator.com/V2/Http.svc/TranslateArray" :
+			"http://api.microsofttranslator.com/V2/Http.svc/TranslateArray2";
 		my $content_xml = $self->_createContentXMLTranslateArray(
 			$lang_from, $lang_to, $text_array,
 		);
@@ -194,9 +197,13 @@ sub _sendRequest {
 		my $response = $ua->request( $request );
 
 		if ( $response->is_success ) {
-			my $result_array = $self->_decodeTranslateArrayOutput(
-				$response->decoded_content
-			);
+			my $result_array = $function eq 'TranslateArray' ?
+				$self->_decodeTranslateArrayOutput(
+					$response->decoded_content
+				) :
+				$self->_decodeTranslateArray2Output(
+					$response->decoded_content
+				);
 			return $result_array;
 		} else {
 			croak $response->status_line;
